@@ -14,14 +14,14 @@ import (
 // Instance is the memberlist gossip instance for membership management and real-time data sharing.
 type Instance struct {
     Name       string // Name for identifying this peer
-    GossipPort uint16 // Port used for gossip communication
+    GossipPort int    // Port used for gossip communication
     Cluster    *memberlist.Memberlist
     Peers      []model.Peer // Known peers. Usually it's the result of the last round of health check
     PeersLock  sync.Mutex
 }
 
 // NewInstance create a Gossip instance
-func NewInstance(name string, gossipPort uint16) *Instance {
+func NewInstance(name string, gossipPort int) *Instance {
     // Initialise a memberlist.List for this instance
     conf := memberlist.DefaultLocalConfig()
     conf.BindPort = int(gossipPort)
@@ -109,7 +109,7 @@ func (i *Instance) healthCheck() {
         p := model.Peer{
             Name:       name,
             Hostname:   hostname,
-            GossipPort: gossipPort,
+            GossipPort: int(gossipPort),
         }
         conn, err := net.DialTimeout("tcp", fmt.Sprintf("%s:%d", hostname, gossipPort), timeout)
         // Successfully connected = alive, otherwise = dead

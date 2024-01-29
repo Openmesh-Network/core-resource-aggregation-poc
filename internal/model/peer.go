@@ -4,6 +4,6 @@ package model
 type Peer struct {
     Name       string
     Hostname   string
-    GossipPort uint16
+    GossipPort int
     Alive      bool
 }
