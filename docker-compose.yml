@@ -1,0 +1,42 @@
+version: '3'
+
+services:
+  xnode1:
+    image: xnode:latest
+    container_name: xnode1
+    environment:
+      - XNODE_NAME=Xnode-1
+    networks:
+      xnode-network:
+        ipv4_address: 192.168.1.110
+  xnode2:
+    image: xnode:latest
+    container_name: xnode2
+    environment:
+      - XNODE_NAME=Xnode-2
+    networks:
+      xnode-network:
+        ipv4_address: 192.168.1.111
+  xnode3:
+    image: xnode:latest
+    container_name: xnode3
+    environment:
+      - XNODE_NAME=Xnode-3
+    networks:
+      xnode-network:
+        ipv4_address: 192.168.1.112
+  xnode4:
+    image: xnode:latest
+    container_name: xnode4
+    environment:
+      - XNODE_NAME=Xnode-4
+    networks:
+      xnode-network:
+        ipv4_address: 192.168.1.113
+
+networks:
+  xnode-network:
+    ipam:
+      driver: default
+      config:
+        - subnet: "192.168.1.0/24"
