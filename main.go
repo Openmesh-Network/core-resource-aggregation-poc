@@ -31,6 +31,11 @@ func main() {
     if knownPeersString != "" {
         knownPeers = strings.Split(knownPeersString, ",")
     }
+    // XNODE_HTTP_PORT: number
+    httpPort, _ := strconv.Atoi(os.Getenv("XNODE_HTTP_PORT"))
+    if httpPort == 0 {
+        httpPort = 9080
+    }
 
     // Initialise graceful shutdown
     cancelCtx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
@@ -40,7 +45,7 @@ func main() {
     signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
 
     // Initialise and start the instance
-    pocInstance := instance.NewInstance(peerName, gossipPort)
+    pocInstance := instance.NewInstance(peerName, gossipPort, httpPort)
     pocInstance.Start(cancelCtx, knownPeers)
 
     // Stop here!
@@ -51,4 +56,5 @@ func main() {
     if err := pocInstance.Gossip.Leave(); err != nil {
         log.Printf("Failed to leave the cluster: %s", err.Error())
     }
+    pocInstance.HTTP.Stop()
 }
