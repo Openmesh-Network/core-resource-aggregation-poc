@@ -9,7 +9,6 @@ import (
     "strconv"
     "strings"
     "syscall"
-    "time"
 )
 
 func main() {
@@ -38,7 +37,7 @@ func main() {
     }
 
     // Initialise graceful shutdown
-    cancelCtx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+    cancelCtx, cancel := context.WithCancel(context.Background())
     defer cancel()
 
     sigChan := make(chan os.Signal, 1)
