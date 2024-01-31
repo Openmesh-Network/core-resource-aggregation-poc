@@ -24,7 +24,7 @@ type Instance struct {
 func NewInstance(name string, gossipPort int) *Instance {
     // Initialise a memberlist.List for this instance
     conf := memberlist.DefaultLocalConfig()
-    conf.BindPort = int(gossipPort)
+    conf.BindPort = gossipPort
     conf.Name = name
     // TODO Add delegates for message sharing here
     //conf.Delegate = &DataDelegate{}
