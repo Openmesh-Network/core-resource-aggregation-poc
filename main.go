@@ -1,59 +1,71 @@
 package main
 
 import (
-    "context"
-    "log"
-    "openmesh.network/aggregationpoc/internal/instance"
-    "os"
-    "os/signal"
-    "strconv"
-    "strings"
-    "syscall"
+	"context"
+	"log"
+	"openmesh.network/aggregationpoc/internal/instance"
+	"os"
+	"os/signal"
+	"strconv"
+	"strings"
+	"syscall"
 )
 
 func main() {
-    // Read instance name, gossip port, and known peers from the environment
-    // XNODE_NAME: string
-    peerName := os.Getenv("XNODE_NAME")
-    if peerName == "" {
-        peerName = "Xnode-1"
-    }
-    // XNODE_GOSSIP_PORT: number
-    gossipPort, _ := strconv.Atoi(os.Getenv("XNODE_GOSSIP_PORT"))
-    if gossipPort == 0 {
-        gossipPort = 9090
-    }
-    // XNODE_KNOWN_PEERS: addresses split by comma (,)
-    // e.g., 127.0.0.1:9090,127.0.0.1:9091
-    knownPeersString := os.Getenv("XNODE_KNOWN_PEERS")
-    var knownPeers []string
-    if knownPeersString != "" {
-        knownPeers = strings.Split(knownPeersString, ",")
-    }
-    // XNODE_HTTP_PORT: number
-    httpPort, _ := strconv.Atoi(os.Getenv("XNODE_HTTP_PORT"))
-    if httpPort == 0 {
-        httpPort = 9080
-    }
+	// Read instance name, gossip port, and known peers from the environment
+	// XNODE_NAME: string
+	peerName := os.Getenv("XNODE_NAME")
+	if peerName == "" {
+		peerName = "Xnode-1"
+	}
+	// XNODE_GOSSIP_PORT: number
+	gossipPort, _ := strconv.Atoi(os.Getenv("XNODE_GOSSIP_PORT"))
+	if gossipPort == 0 {
+		gossipPort = 9090
+	}
+	// XNODE_XXXX_PEERS: addresses split by comma (,)
+	// e.g., 127.0.0.1:9090,127.0.0.1:9091
+	gossipPeers := make([]string, 0)
+	httpPeers := make([]string, 0)
 
-    // Initialise graceful shutdown
-    cancelCtx, cancel := context.WithCancel(context.Background())
-    defer cancel()
+	// XNODE_HTTP_PORT: number
+	httpPort, _ := strconv.Atoi(os.Getenv("XNODE_HTTP_PORT"))
+	if httpPort == 0 {
+		httpPort = 9080
+	}
 
-    sigChan := make(chan os.Signal, 1)
-    signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
+	{
+		gossipPeersString := os.Getenv("XNODE_GOSSIP_PEERS")
+		if gossipPeersString != "" {
+			gossipPeers = strings.Split(gossipPeersString, ",")
+		}
 
-    // Initialise and start the instance
-    pocInstance := instance.NewInstance(peerName, gossipPort, httpPort)
-    pocInstance.Start(cancelCtx, knownPeers)
+		httpPeers = make([]string, len(gossipPeers))
 
-    // Stop here!
-    sig := <-sigChan
-    log.Printf("Termination signal received: %v", sig)
+		for i, g := range gossipPeers {
+			// NOTE(Tom): This assumes all peers have the SAME http port
+			httpPeers[i] = strings.Split(g, ":")[0] + ":" + strconv.Itoa(httpPort)
+		}
+	}
 
-    // Cleanup
-    if err := pocInstance.Gossip.Leave(); err != nil {
-        log.Printf("Failed to leave the cluster: %s", err.Error())
-    }
-    pocInstance.HTTP.Stop()
+	// Initialise graceful shutdown
+	cancelCtx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	sigChan := make(chan os.Signal, 1)
+	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
+
+	// Initialise and start the instance
+	pocInstance := instance.NewInstance(peerName, gossipPort, httpPort)
+	pocInstance.Start(cancelCtx, gossipPeers, httpPeers)
+
+	// Stop here!
+	sig := <-sigChan
+	log.Printf("Termination signal received: %v", sig)
+
+	// Cleanup
+	if err := pocInstance.Gossip.Leave(); err != nil {
+		log.Printf("Failed to leave the cluster: %s", err.Error())
+	}
+	pocInstance.HTTP.Stop()
 }
