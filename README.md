@@ -33,6 +33,8 @@ That's where we launch all the goroutines for tracking peers.
 ### IPFS
 The code for file sharing, splitting and all that.
 
+# Notes
+- The IPFS chunking thing breaks a thing up into 256
 # TODO:
 - ipfsInstance.Start() is blocking so gossip doesn't run
 - IPFS
