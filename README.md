@@ -18,7 +18,6 @@ The member management part requires three environment variables:
 
 
 ## Getting up to speed
-
 The codebase is small for now. 
 If you just follow the flow of the program from main.go, 
 you should get an idea of how everything is ran.
@@ -35,6 +34,7 @@ That's where we launch all the goroutines for tracking peers.
 The code for file sharing, splitting and all that.
 
 # TODO:
+- ipfsInstance.Start() is blocking so gossip doesn't run
 - IPFS
     - Self assign storage
         - Nodes have a picture of what data is available

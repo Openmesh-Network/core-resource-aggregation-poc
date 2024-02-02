@@ -8,6 +8,7 @@ services:
       - XNODE_NAME=Xnode-1
       - XNODE_GOSSIP_PORT=9091
       - XNODE_GOSSIP_PEERS=192.168.1.111:9092,192.168.1.112:9093
+      - XNODE_IP=192.168.1.110
     networks:
       xnode-network:
         ipv4_address: 192.168.1.110
@@ -18,6 +19,7 @@ services:
       - XNODE_NAME=Xnode-2
       - XNODE_GOSSIP_PORT=9092
       - XNODE_GOSSIP_PEERS=192.168.1.110:9091
+      - XNODE_IP=192.168.1.111
     networks:
       xnode-network:
         ipv4_address: 192.168.1.111
@@ -28,6 +30,7 @@ services:
       - XNODE_NAME=Xnode-3
       - XNODE_GOSSIP_PORT=9093
       - XNODE_GOSSIP_PEERS=192.168.1.110:9091,192.168.1.111:9092
+      - XNODE_IP=192.168.1.112
     networks:
       xnode-network:
         ipv4_address: 192.168.1.112
@@ -38,6 +41,7 @@ services:
       - XNODE_NAME=Xnode-4
       - XNODE_GOSSIP_PORT=9094
       - XNODE_GOSSIP_PEERS=192.168.1.112:9093
+      - XNODE_IP=192.168.1.113
     networks:
       xnode-network:
         ipv4_address: 192.168.1.113
