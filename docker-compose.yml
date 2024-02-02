@@ -12,6 +12,8 @@ services:
     networks:
       xnode-network:
         ipv4_address: 192.168.1.110
+    extra_hosts:
+        - 192.168.1.222:host-gateway # this maps  192.168.222 to localhost
   xnode2:
     image: xnode:latest
     container_name: xnode2
@@ -23,6 +25,8 @@ services:
     networks:
       xnode-network:
         ipv4_address: 192.168.1.111
+    extra_hosts:
+        - 192.168.1.222:host-gateway # this maps  192.168.222 to localhost
   xnode3:
     image: xnode:latest
     container_name: xnode3
@@ -34,6 +38,8 @@ services:
     networks:
       xnode-network:
         ipv4_address: 192.168.1.112
+    extra_hosts:
+        - 192.168.1.222:host-gateway # this maps  192.168.222 to localhost
   xnode4:
     image: xnode:latest
     container_name: xnode4
@@ -45,9 +51,12 @@ services:
     networks:
       xnode-network:
         ipv4_address: 192.168.1.113
+    extra_hosts:
+        - 192.168.1.222:host-gateway # this maps  192.168.222 to localhost
 
 networks:
   xnode-network:
+    driver: bridge
     ipam:
       driver: default
       config:
