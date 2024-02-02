@@ -35,6 +35,16 @@ func main() {
     if httpPort == 0 {
         httpPort = 9080
     }
+    // XNODE_GROUP_NAME: string
+    groupName := os.Getenv("XNODE_GROUP_NAME")
+    if groupName == "" {
+        groupName = "Xnode"
+    }
+    // XNODE_P2P_PORT: number
+    p2pPort, _ := strconv.Atoi(os.Getenv("XNODE_P2P_PORT"))
+    if p2pPort == 0 {
+        p2pPort = 10090
+    }
 
     // Initialise graceful shutdown
     cancelCtx, cancel := context.WithCancel(context.Background())
@@ -44,7 +54,7 @@ func main() {
     signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
 
     // Initialise and start the instance
-    pocInstance := instance.NewInstance(peerName, gossipPort, httpPort)
+    pocInstance := instance.NewInstance(peerName, groupName, gossipPort, httpPort, p2pPort)
     pocInstance.Start(cancelCtx, knownPeers)
 
     // Stop here!
@@ -56,4 +66,7 @@ func main() {
         log.Printf("Failed to leave the cluster: %s", err.Error())
     }
     pocInstance.HTTP.Stop()
+    if err := pocInstance.P2P.Stop(); err != nil {
+        log.Printf("Failed to stop libp2p instance: %s", err.Error())
+    }
 }
