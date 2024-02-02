@@ -7,6 +7,9 @@ services:
     environment:
       - XNODE_NAME=Xnode-1
       - XNODE_GOSSIP_PORT=9090
+      - XNODE_HTTP_PORT=8090
+      - XNODE_P2P_PORT=10090
+      - XNODE_GROUP_NAME=Xnode
     networks:
       xnode-network:
         ipv4_address: 192.168.1.110
@@ -16,7 +19,10 @@ services:
     environment:
       - XNODE_NAME=Xnode-2
       - XNODE_GOSSIP_PORT=29090
+      - XNODE_HTTP_PORT=8091
       - XNODE_KNOWN_PEERS=192.168.1.110:9090
+      - XNODE_P2P_PORT=10091
+      - XNODE_GROUP_NAME=Xnode
     networks:
       xnode-network:
         ipv4_address: 192.168.1.111
@@ -26,7 +32,10 @@ services:
     environment:
       - XNODE_NAME=Xnode-3
       - XNODE_GOSSIP_PORT=9093
+      - XNODE_HTTP_PORT=8092
       - XNODE_KNOWN_PEERS=192.168.1.110:9090,192.168.1.111:29090
+      - XNODE_P2P_PORT=10092
+      - XNODE_GROUP_NAME=Xnode
     networks:
       xnode-network:
         ipv4_address: 192.168.1.112
@@ -36,7 +45,10 @@ services:
     environment:
       - XNODE_NAME=Xnode-4
       - XNODE_GOSSIP_PORT=9094
+      - XNODE_HTTP_PORT=8093
       - XNODE_KNOWN_PEERS=192.168.1.112:9093
+      - XNODE_P2P_PORT=10093
+      - XNODE_GROUP_NAME=Xnode
     networks:
       xnode-network:
         ipv4_address: 192.168.1.113
