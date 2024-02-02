@@ -32,11 +32,15 @@ func NewInstance(instanceName string, gossipPort int, httpPort int) *Instance {
 
 // Start starts all the instances, then start the top-level instance
 func (i *Instance) Start(ctx context.Context, gossipPeers []string, httpPeers []string) {
-	log.Printf("Running ipfs!!\n")
-	i.Ipfs.Start(ctx, httpPeers)
-	log.Println("Running http!!")
 
-	i.Gossip.Start(ctx, gossipPeers, i.Ipfs)
+	log.Println("Running http!!")
 	i.HTTP.Start()
+
+	// NOTE(Tom): I've disabled gossip for now since I'm not using it and it crowds the logs
+	// i.Gossip.Start(ctx, gossipPeers, i.Ipfs)
+
+	log.Printf("Running ipfs!!\n")
+	// XXX: Ipfs.Start is blocking for now. I'm very silly
+	i.Ipfs.Start(ctx, httpPeers)
 
 }
