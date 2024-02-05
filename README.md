@@ -34,10 +34,16 @@ That's where we launch all the goroutines for tracking peers.
 The code for file sharing, splitting and all that.
 
 # Notes
-- The IPFS chunking thing breaks a thing up into 256
+- The IPFS chunking thing breaks a thing up into 256kb blocks
+
 # TODO:
-- ipfsInstance.Start() is blocking so gossip doesn't run
-- IPFS
+## Bugs
+- [X] ipfsInstance.Start() is blocking so gossip doesn't run
+- [X] Nodes only seed half the data they store??? Or maybe metadata makes it look doubled?
+    - turns out i was calling make() on the leaves and setting the size instead of the cap 🤦
+- [ ] Xnode-1 doesn't shutdown gracefully
+- [ ] Xnode-1 takes up double the storage it should. Maybe blockstore is duplicated??
+## IPFS
     - Self assign storage
         - Nodes have a picture of what data is available
             - *Compromise*: Internal list of all sources
@@ -46,8 +52,15 @@ The code for file sharing, splitting and all that.
                 - Size, Amount, and Layout? Basically the leaf nodes
                 - Otherwise nodes have to fetch ACTUAL composition of the network from peers so they can't plan a greedy strategy before downloading metadata
         - Nodes 
-    - Download files
-    - Seed files
-- GUI
-    - Get basic frontend working
-        - HTMX that makes GET requests to nodes for intel
+    - [X] Download files
+    - [X] Seed files
+    - [ ] Should all be seeding the metadata
+    - [ ] Self allocate portions and only download those
+    - [ ] Add status for each node
+## GUI
+    - [X] Get basic frontend working
+        - [X] HTMX that makes GET requests to nodes for intel
+        - [X] Show blocks status
+        - [X] Show wanted blocks
+        - [X] Kill nodes
+        - [X] Change data size of nodes

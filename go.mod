@@ -6,13 +6,13 @@ require (
 	github.com/gin-gonic/gin v1.9.1
 	github.com/hashicorp/memberlist v0.5.0
 	github.com/ipfs/boxo v0.17.0
-	github.com/ipfs/go-block-format v0.2.0
 	github.com/ipfs/go-cid v0.4.1
 	github.com/ipfs/go-datastore v0.6.0
 	github.com/libp2p/go-libp2p v0.32.2
 	github.com/libp2p/go-libp2p-routing-helpers v0.7.3
 	github.com/multiformats/go-multiaddr v0.12.2
 	github.com/multiformats/go-multicodec v0.9.0
+	github.com/rs/cors v1.10.1
 	github.com/stretchr/testify v1.8.4
 )
 
@@ -60,6 +60,7 @@ require (
 	github.com/hashicorp/golang-lru/v2 v2.0.7 // indirect
 	github.com/huin/goupnp v1.3.0 // indirect
 	github.com/ipfs/bbloom v0.0.4 // indirect
+	github.com/ipfs/go-block-format v0.2.0 // indirect
 	github.com/ipfs/go-ipfs-delay v0.0.1 // indirect
 	github.com/ipfs/go-ipfs-pq v0.0.3 // indirect
 	github.com/ipfs/go-ipfs-util v0.0.3 // indirect

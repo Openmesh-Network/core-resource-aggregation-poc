@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/hashicorp/memberlist"
-	"openmesh.network/aggregationpoc/internal/ipfs"
 	"openmesh.network/aggregationpoc/internal/model"
 )
 
@@ -45,7 +44,7 @@ func NewInstance(name string, gossipPort int) *Instance {
 }
 
 // Start starting try to join an existing cluster via some known peers and starting health check
-func (i *Instance) Start(ctx context.Context, knownPeers []string, ipfsInstance *ipfs.Instance) {
+func (i *Instance) Start(ctx context.Context, knownPeers []string) {
 	i.Join(ctx, knownPeers)
 	go i.startHealthCheck(ctx)
 }

@@ -12,8 +12,6 @@ services:
     networks:
       xnode-network:
         ipv4_address: 192.168.1.110
-    extra_hosts:
-        - 192.168.1.222:host-gateway # this maps  192.168.222 to localhost
   xnode2:
     image: xnode:latest
     container_name: xnode2
@@ -25,8 +23,6 @@ services:
     networks:
       xnode-network:
         ipv4_address: 192.168.1.111
-    extra_hosts:
-        - 192.168.1.222:host-gateway # this maps  192.168.222 to localhost
   xnode3:
     image: xnode:latest
     container_name: xnode3
@@ -38,8 +34,6 @@ services:
     networks:
       xnode-network:
         ipv4_address: 192.168.1.112
-    extra_hosts:
-        - 192.168.1.222:host-gateway # this maps  192.168.222 to localhost
   xnode4:
     image: xnode:latest
     container_name: xnode4
@@ -51,8 +45,28 @@ services:
     networks:
       xnode-network:
         ipv4_address: 192.168.1.113
-    extra_hosts:
-        - 192.168.1.222:host-gateway # this maps  192.168.222 to localhost
+  xnode5:
+    image: xnode:latest
+    container_name: xnode5
+    environment:
+      - XNODE_NAME=Xnode-5
+      - XNODE_GOSSIP_PORT=9095
+      - XNODE_GOSSIP_PEERS=192.168.1.113:9094,192.168.1.111:9092
+      - XNODE_IP=192.168.1.114
+    networks:
+      xnode-network:
+        ipv4_address: 192.168.1.114
+  xnode6:
+    image: xnode:latest
+    container_name: xnode6
+    environment:
+      - XNODE_NAME=Xnode-6
+      - XNODE_GOSSIP_PORT=9096
+      - XNODE_GOSSIP_PEERS=192.168.1.114:9095,192.168.1.113:9094,192.168.1.111:9092
+      - XNODE_IP=192.168.1.115
+    networks:
+      xnode-network:
+        ipv4_address: 192.168.1.115
 
 networks:
   xnode-network:
