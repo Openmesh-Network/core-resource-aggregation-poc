@@ -18,7 +18,7 @@ services:
     environment:
       - XNODE_NAME=Xnode-2
       - XNODE_GOSSIP_PORT=9092
-      - XNODE_GOSSIP_PEERS=192.168.1.110:9091
+      - XNODE_GOSSIP_PEERS=192.168.1.110:9091,192.168.1.114:9095
       - XNODE_IP=192.168.1.111
     networks:
       xnode-network:
@@ -62,7 +62,7 @@ services:
     environment:
       - XNODE_NAME=Xnode-6
       - XNODE_GOSSIP_PORT=9096
-      - XNODE_GOSSIP_PEERS=192.168.1.114:9095,192.168.1.113:9094,192.168.1.111:9092
+      - XNODE_GOSSIP_PEERS=192.168.1.114:9095,192.168.1.113:9094,192.168.1.111:9092,192.168.1.114:9095
       - XNODE_IP=192.168.1.115
     networks:
       xnode-network:

@@ -54,9 +54,9 @@ The code for file sharing, splitting and all that.
         - Nodes 
     - [X] Download files
     - [X] Seed files
-    - [ ] Should all be seeding the metadata
-    - [ ] Self allocate portions and only download those
-    - [ ] Add status for each node
+    - [X] Self allocate portions and only download those
+    - [X] Should all be seeding the metadata
+    - [ ] Add status for each node (looking for peers, fetching metadata, picking blocks, seeding, etc...)
 ## GUI
     - [X] Get basic frontend working
         - [X] HTMX that makes GET requests to nodes for intel
