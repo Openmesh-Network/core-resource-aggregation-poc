@@ -144,7 +144,7 @@ The member management part requires three environment variables:
     - [X] Self allocate portions and only download those
     - [X] Should all be seeding the metadata
     - [X] Add status for each node (looking for peers, fetching metadata, picking blocks, seeding, etc...)
-    - [ ] Simplify process to generate sources, move the script from the other repo to over here
+    - [X] Simplify process to generate sources, move the script from the other repo to over here
 
 ## GUI
     - [X] Get basic frontend working
