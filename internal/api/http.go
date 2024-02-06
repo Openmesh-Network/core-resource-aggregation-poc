@@ -56,6 +56,35 @@ func NewHTTPInstance(httpPort int, ipfsInstance *ipfs.Instance) *HTTPInstance {
 		bytes, _ := os.ReadFile("index.html")
 		c.Data(http.StatusOK, "text/html", []byte(bytes))
 	})
+	s.GET("/htmx/status", func(c *gin.Context) {
+		s := ""
+
+		switch ipfsInstance.Status {
+		case ipfs.DOWN:
+			s = "down"
+			break
+		case ipfs.CONNECTING_TO_PEERS:
+			s = "connecting to peers..."
+			break
+		case ipfs.GETTING_METADATA:
+			s = "downloading metadata..."
+			break
+		case ipfs.ADJUSTING_WANTED_BLOCKS:
+			s = "readjusting wanted blocks..."
+			break
+		case ipfs.DOWNLOADING_BLOCKS:
+			s = "downloading blocks..."
+			break
+		case ipfs.SEEDING_BLOCKS:
+			s = "seeding blocks..."
+			break
+		default:
+			s = "unknown..."
+			break
+		}
+
+		c.Data(http.StatusOK, "text/html", []byte(s))
+	})
 	// XXX: if this goes anywhere near a production delete
 	s.GET("/htmx/resize", func(c *gin.Context) {
 		c.Request.ParseForm()
