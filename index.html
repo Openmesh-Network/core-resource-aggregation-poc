@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script src="https://unpkg.com/htmx.org@1.9.10" integrity="sha384-D1Kt99CQMDuVetoL1lrYwg5t+9QdHe7NLX/SoJYkXDFfX37iInKRy5xLSi8nO7UC" crossorigin="anonymous"></script>
+    <title>Demo Page</title>
+</head>
+<style>
+    html, body {
+        font-family: Helvetica;
+    }
+    main {
+        /*background-color: pink;*/
+        max-width: 900px;
+        display: flex;
+        align-items: center;
+        width: 100%;
+        margin: auto;
+        min-height: 100vh;
+    }
+    #node-container {
+        display: flex;
+        flex-wrap: wrap;
+        /*background-color: tan;*/
+        justify-content: center;
+        width: 100%;
+        height: 100%;
+    }
+    .node {
+        width: 430px;
+        margin: 2px;
+        min-height: 200px;
+        padding-left: 6px;
+        padding-right: 6px;
+        border-radius: 15px;
+        border: solid black 2px;
+        background-color: white;
+    }
+    .blockcontainer {
+        display: flex;
+        display: grid; 
+        grid-template-columns: repeat(auto-fill, 12px); 
+        padding: 4.5px;
+        margin-bottom: 4px;
+        background-color: #eeeeff;
+    }
+    .onblock {
+        background-color: green;
+        width: 10px;
+        height: 10px;
+        margin: 1px;
+    }
+    .wantblock {
+        background-color: orange;
+        width: 10px;
+        height: 10px;
+        margin: 1px;
+    }
+    .offblock {
+        background-color: red;
+        width: 10px;
+        height: 10px;
+        margin: 1px;
+    }
+    .closeX {
+        width: 20px;
+        height: 20px;
+        float: right;
+        margin-top: 10px;
+        cursor: pointer;
+        user-select: none;
+        select: none;
+    }
+</style>
+<body>
+    <main>
+<!-- show the sources available -->
+
+<!-- node container -->
+        <div id="node-container">
+            <div class="node">
+                <div class="closeX" hx-request='{"noHeaders": true}' hx-get="http://192.168.1.110:9080/kill" hx-target="closest .node" hx-swap="outerHTML"><a>X</a></div>
+                <p><b hx-get="http://192.168.1.110:9080/htmx/name" hx-request='{"noHeaders": true}' hx-trigger="load, every 300ms"></b></p>
+                <p>Status: <b hx-get="http://192.168.1.110:9080/htmx/status" hx-request='{"noHeaders": true}' hx-trigger="load, every 300ms"></b></p>
+                <div hx-get="http://192.168.1.110:9080/htmx/resize" hx-request='{"noHeaders": true}' hx-trigger="load, every 300ms"></div>
+                <div hx-get="http://192.168.1.110:9080/htmx/summary" hx-request='{"noHeaders": true}' hx-trigger="every 200ms"></div>
+                <div hx-get="http://192.168.1.110:9080/htmx/blocks" hx-request='{"noHeaders": true}' hx-trigger="every 400ms"></div>
+            </div>
+            <div class="node">
+                <div class="closeX" hx-request='{"noHeaders": true}' hx-get="http://192.168.1.111:9080/kill" hx-target="closest .node" hx-swap="outerHTML">X</div>
+                <p><b hx-get="http://192.168.1.111:9080/htmx/name" hx-request='{"noHeaders": true}' hx-trigger="load, every 300ms"></b></p>
+                <p>Status: <b hx-get="http://192.168.1.111:9080/htmx/status" hx-request='{"noHeaders": true}' hx-trigger="load, every 300ms"></b></p>
+                <div hx-get="http://192.168.1.111:9080/htmx/resize" hx-request='{"noHeaders": true}' hx-trigger="load, every 300ms"></div>
+                <div hx-get="http://192.168.1.111:9080/htmx/summary" hx-request='{"noHeaders": true}' hx-trigger="every 200ms"></div>
+                <div hx-get="http://192.168.1.111:9080/htmx/blocks" hx-request='{"noHeaders": true}' hx-trigger="every 400ms"></div>
+            </div>
+            <div class="node">
+                <div class="closeX" hx-request='{"noHeaders": true}' hx-get="http://192.168.1.112:9080/kill" hx-target="closest .node" hx-swap="outerHTML">X</div>
+                <p><b hx-get="http://192.168.1.112:9080/htmx/name" hx-request='{"noHeaders": true}' hx-trigger="load, every 300ms"></b></p>
+                <p>Status: <b hx-get="http://192.168.1.112:9080/htmx/status" hx-request='{"noHeaders": true}' hx-trigger="load, every 300ms"></b></p>
+                <div hx-get="http://192.168.1.112:9080/htmx/resize" hx-request='{"noHeaders": true}' hx-trigger="load, every 300ms"></div>
+                <div hx-get="http://192.168.1.112:9080/htmx/summary" hx-request='{"noHeaders": true}' hx-trigger="every 200ms"></div>
+                <div hx-get="http://192.168.1.112:9080/htmx/blocks" hx-request='{"noHeaders": true}' hx-trigger="every 400ms"></div>
+            </div>
+            <div class="node">
+                <div class="closeX" hx-request='{"noHeaders": true}' hx-get="http://192.168.1.113:9080/kill" hx-target="closest .node" hx-swap="outerHTML">X</div>
+                <p><b hx-get="http://192.168.1.113:9080/htmx/name" hx-request='{"noHeaders": true}' hx-trigger="load, every 300ms"></b></p>
+                <p>Status: <b hx-get="http://192.168.1.113:9080/htmx/status" hx-request='{"noHeaders": true}' hx-trigger="load, every 300ms"></b></p>
+                <div hx-get="http://192.168.1.113:9080/htmx/resize" hx-request='{"noHeaders": true}' hx-trigger="load, every 300ms"></div>
+                <div hx-get="http://192.168.1.113:9080/htmx/summary" hx-request='{"noHeaders": true}' hx-trigger="every 200ms"></div>
+                <div hx-get="http://192.168.1.113:9080/htmx/blocks" hx-request='{"noHeaders": true}' hx-trigger="every 400ms"></div>
+            </div>
+            <div class="node">
+                <div class="closeX" hx-request='{"noHeaders": true}' hx-get="http://192.168.1.114:9080/kill" hx-target="closest .node" hx-swap="outerHTML">X</div>
+                <p><b hx-get="http://192.168.1.114:9080/htmx/name" hx-request='{"noHeaders": true}' hx-trigger="load, every 300ms"></b></p>
+                <p>Status: <b hx-get="http://192.168.1.114:9080/htmx/status" hx-request='{"noHeaders": true}' hx-trigger="load, every 300ms"></b></p>
+                <div hx-get="http://192.168.1.114:9080/htmx/resize" hx-request='{"noHeaders": true}' hx-trigger="load, every 300ms"></div>
+                <div hx-get="http://192.168.1.114:9080/htmx/summary" hx-request='{"noHeaders": true}' hx-trigger="every 200ms"></div>
+                <div hx-get="http://192.168.1.114:9080/htmx/blocks" hx-request='{"noHeaders": true}' hx-trigger="every 400ms"></div>
+            </div>
+            <div class="node">
+                <div class="closeX" hx-request='{"noHeaders": true}' hx-get="http://192.168.1.115:9080/kill" hx-target="closest .node" hx-swap="outerHTML">X</div>
+                <p><b hx-get="http://192.168.1.115:9080/htmx/name" hx-request='{"noHeaders": true}' hx-trigger="load, every 300ms"></b></p>
+                <p>Status: <b hx-get="http://192.168.1.115:9080/htmx/status" hx-request='{"noHeaders": true}' hx-trigger="load, every 300ms"></b></p>
+                <div hx-get="http://192.168.1.115:9080/htmx/summary" hx-request='{"noHeaders": true}' hx-trigger="every 200ms"></div>
+                <div hx-get="http://192.168.1.115:9080/htmx/resize" hx-request='{"noHeaders": true}' hx-trigger="load, every 300ms"></div>
+                <div hx-get="http://192.168.1.115:9080/htmx/blocks" hx-request='{"noHeaders": true}' hx-trigger="every 400ms"></div>
+            </div>
+        </div>
+    </main>
+</body>
+</html>
