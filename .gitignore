@@ -28,5 +28,3 @@ go.work
 
 # Garbages
 .DS_Store
-
-sources/*
