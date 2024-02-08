@@ -53,7 +53,6 @@ func (i *Instance) Start(ctx context.Context, gossipPeers []string, httpPeers []
 	// i.Gossip.Start(ctx, gossipPeers, i.Ipfs)
 
 	log.Printf("Running ipfs!!\n")
-	// XXX: Ipfs.Start is blocking for now. I'm very silly
 	i.Ipfs.Start(ctx, httpPeers)
 
 	err := i.P2P.Start(ctx)
