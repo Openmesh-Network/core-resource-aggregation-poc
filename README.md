@@ -116,10 +116,6 @@ The member management part requires three environment variables:
 
 ---
 
-
-# Notes
-- The IPFS chunking thing breaks a thing up into 256kb blocks
-
 # TODO:
 
 ## Bugs
