@@ -1,4 +1,4 @@
-# Xnode Resource Aggregation Layer Proof-of-Concept (PoC)
+# Resource Aggregation Layer Proof of Concept
 
 A proof-of-concept and testbed for future RAL project.
 
