@@ -60,7 +60,7 @@ All we do is call `host.Connect(...)` to some known peers to test the connection
 
 #### IPFS in this project
 
-We set up XNode1 to be a file seeder.
+We set up Xnode1 to be a file seeder.
 Instead of running the same logic as the other nodes; 
 it calls `runSeedServer(...)` which opens up all the files in the sources folder, turns them into CIDs and seeds all the chunks.
 This simulates someone passing the data into the network.
