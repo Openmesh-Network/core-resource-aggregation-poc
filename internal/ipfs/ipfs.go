@@ -375,8 +375,8 @@ func (inst *Instance) Start(ctx context.Context, httpPeers []string) {
 				// XXX: maybe use a stack instead of recursion...
 				// also use GetMany instead of Get
 				leafCount := 0
-				var recurseGetleaves func(c cid.Cid)
-				recurseGetleaves = func(c cid.Cid) {
+				var getleaves func(c cid.Cid)
+				getleaves = func(c cid.Cid) {
 					node, _ := dserv.Get(ctx, c)
 
 					links := node.Links()
@@ -395,7 +395,7 @@ func (inst *Instance) Start(ctx context.Context, httpPeers []string) {
 							return
 						} else {
 							for i := range cids {
-								recurseGetleaves(cids[i])
+								getleaves(cids[i])
 							}
 							return
 						}
@@ -404,11 +404,12 @@ func (inst *Instance) Start(ctx context.Context, httpPeers []string) {
 						leaves[leafCount] = c
 						leafCount++
 					} else {
+						// crappy assertion
 						log.Panicln("This should be impossible")
 					}
 				}
 
-				recurseGetleaves(node.Cid())
+				getleaves(node.Cid())
 			}
 		}
 
@@ -570,10 +571,7 @@ func (inst *Instance) Start(ctx context.Context, httpPeers []string) {
 											ctx, cancel := context.WithTimeout(context.Background(), time.Millisecond*500)
 											defer cancel()
 
-											// log.Println("Started waiting for", i)
-											// t := time.Now()
 											_, err := dserv.Get(ctx, leaves[index])
-											// log.Println("Finished waiting for", i, "took:", time.Since(t))
 											if err == nil {
 												mu.Lock()
 												defer mu.Unlock()
@@ -583,8 +581,6 @@ func (inst *Instance) Start(ctx context.Context, httpPeers []string) {
 										}(i)
 
 										isInSeedList = true
-
-										// log.Println("Success!", i, leaves[i])
 									} else {
 										log.Println("Fail!", i, leaves[i])
 									}
@@ -592,7 +588,6 @@ func (inst *Instance) Start(ctx context.Context, httpPeers []string) {
 							}
 
 							if !isInSeedList {
-								// we shouldn't be storing blocks not in the seed list
 								inst.Bservice.DeleteBlock(ctx, leaves[i])
 							}
 						}
