@@ -34,3 +34,5 @@ sources.json
 sources/*
 
 !sources/.gitkeep
+
+resource-aggregation-poc
