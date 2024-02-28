@@ -1,6 +1,6 @@
-# Xnode Resource Aggregation Layer Proof-of-Concept (PoC)
+# Resource Aggregation Layer Proof of Concept
 
-A proof-of-concept and testbed for future RAG project.
+A proof-of-concept and testbed for future RAL project.
 
 ## Project Layout
 
@@ -60,7 +60,7 @@ All we do is call `host.Connect(...)` to some known peers to test the connection
 
 #### IPFS in this project
 
-We set up XNode1 to be a file seeder.
+We set up Xnode1 to be a file seeder.
 Instead of running the same logic as the other nodes; 
 it calls `runSeedServer(...)` which opens up all the files in the sources folder, turns them into CIDs and seeds all the chunks.
 This simulates someone passing the data into the network.
@@ -115,10 +115,6 @@ The member management part requires three environment variables:
 
 
 ---
-
-
-# Notes
-- The IPFS chunking thing breaks a thing up into 256kb blocks
 
 # TODO:
 
