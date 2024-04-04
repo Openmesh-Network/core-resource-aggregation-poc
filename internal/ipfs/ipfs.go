@@ -48,9 +48,8 @@ import (
 )
 
 const DEFAULT_STORAGE_BYTES = 20 * 1024 * 1024
-const DEFAULT_BLOCK_SIZE = 256 * 1024
+const DEFAULT_BLOCK_SIZE = 128 * 1024
 
-// we will use the default chunk size, for the fixed chunk size. It's 256Kib
 type Source struct {
 	Name string
 	Size int64
@@ -94,7 +93,7 @@ func blocksInSize(size int64) int64 {
 	// blocks HAVE to fit the data so if they don't divide nicelly, we need an extra chunk to fit the data
 	if size < DEFAULT_BLOCK_SIZE && size > 0 {
 		blockCount = 1
-	} else if size%int64(DEFAULT_BLOCK_SIZE) != 0 && size > int64(chunker.DefaultBlockSize) {
+	} else if size%int64(DEFAULT_BLOCK_SIZE) != 0 && size > int64(DEFAULT_BLOCK_SIZE) {
 		blockCount += 1
 	}
 
@@ -162,24 +161,26 @@ func (inst *Instance) runSeedServer(ctx context.Context) {
 		f, _ := e.Info()
 
 		if !f.IsDir() {
-			fmt.Println(e.Name())
+			if f.Name()[0] != '.' && f.Size() > 0 {
+				fmt.Println(e.Name())
 
-			inst.BlocksToSeed[f.Name()] = make([]int, blocksInSize(int64(f.Size())))
-			for i := 0; i < int(blocksInSize(int64(f.Size()))); i++ {
-				inst.BlocksToSeed[f.Name()][i] = i
-			}
+				inst.BlocksToSeed[f.Name()] = make([]int, blocksInSize(int64(f.Size())))
+				for i := 0; i < int(blocksInSize(int64(f.Size()))); i++ {
+					inst.BlocksToSeed[f.Name()][i] = i
+				}
 
-			c, size, err := inst.seedFile("./sources/" + f.Name())
+				c, size, err := inst.seedFile("./sources/" + f.Name())
 
-			inst.BlocksSeeding[f.Name()] = make([]int, blocksInSize(int64(size)))
-			for i := 0; i < int(blocksInSize(int64(size))); i++ {
-				inst.BlocksSeeding[f.Name()][i] = i
-			}
+				inst.BlocksSeeding[f.Name()] = make([]int, blocksInSize(int64(size)))
+				for i := 0; i < int(blocksInSize(int64(size))); i++ {
+					inst.BlocksSeeding[f.Name()][i] = i
+				}
 
-			fmt.Println("Now seeding", c, "", size/1024, "KB")
+				fmt.Println("Now seeding", c, "", size/1024, "KB")
 
-			if err != nil {
-				panic(err)
+				if err != nil {
+					panic(err)
+				}
 			}
 		}
 	}
@@ -215,7 +216,7 @@ func (inst *Instance) seedFile(filename string) (cid.Cid, uint64, error) {
 		Dagserv: dsrv,
 		NoCopy:  false,
 	}
-	ufsBuilder, err := ufsImportParams.New(chunker.NewSizeSplitter(fileReader, DEFAULT_BLOCK_SIZE)) // Split the file up into fixed sized 256KiB blocks
+	ufsBuilder, err := ufsImportParams.New(chunker.NewSizeSplitter(fileReader, DEFAULT_BLOCK_SIZE))
 	if err != nil {
 		return cid.Undef, 0, err
 	}

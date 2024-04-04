@@ -42,29 +42,30 @@ func main() {
 	}
 
 	builder := new(strings.Builder)
+	count := 0
 
-	for i, e := range entries {
+	for _, e := range entries {
 		fmt.Println(e.Name())
 
 		f, _ := e.Info()
 		if !f.IsDir() {
-			c, err := getCidFromFile("./sources/" + f.Name())
+			// Ignore hidden files, and empty files.
+			if f.Name()[0] != '.' && f.Size() > 0 {
+				c, err := getCidFromFile("./sources/" + f.Name())
 
-			if err != nil {
-				panic(err)
+				if err != nil {
+					panic(err)
+				}
+
+				bytes, _ := json.Marshal(Source{Name: f.Name(), Size: f.Size(), Cid: c.String()})
+
+				if count > 0 {
+					builder.WriteByte('\n')
+				}
+
+				count++
+				builder.Write(bytes)
 			}
-
-			if err != nil {
-				panic(err)
-			}
-
-			bytes, _ := json.Marshal(Source{Name: f.Name(), Size: f.Size(), Cid: c.String()})
-
-			if i > 0 {
-				builder.WriteByte('\n')
-			}
-
-			builder.Write(bytes)
 		}
 	}
 	os.WriteFile("sources.json", []byte(builder.String()), 0644)

@@ -16,11 +16,10 @@ A proof-of-concept and testbed for future RAL project.
 ## How to run
 
 
-1. Fill the sources directory with files you want to seed
-1. run `go run util/generate-sources.go`
-1. run `./build.sh` (calls go build and docker build) or just `CGO_ENABLED=0 GOOS=linux go build -o resource-aggregation-poc && docker build -t xnode:latest .`
-1. run `docker compose up`
-1. open up index.html on a browser to watch your nodes in action, or go to `http://192.168.1.111:9080/dashboard`
+1. Fill the sources directory with files you want to seed.
+1. Run `./build.sh` (generates sources.json, calls go build and docker build).
+1. Run `docker compose up`.
+1. Open up index.html on a browser to watch your nodes in action, or go to `http://192.168.1.111:9080/dashboard`.
 
 
 ---
