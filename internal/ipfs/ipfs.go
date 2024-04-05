@@ -19,6 +19,7 @@ import (
 
 	"github.com/ipfs/go-datastore"
 	dsync "github.com/ipfs/go-datastore/sync"
+	format "github.com/ipfs/go-ipld-format"
 
 	"github.com/libp2p/go-libp2p"
 	"github.com/libp2p/go-libp2p/core/crypto"
@@ -280,6 +281,95 @@ func NewInstance() *Instance {
 	return inst
 }
 
+func (inst *Instance) getNodeAndProcess(ctx context.Context, dserv format.DAGService, source Source) {
+
+	fetchAndProcessChan := make(chan error)
+	// retryFetchChan := make(chan bool) // Needs implementation --> retries periodically.
+
+	var TIMEOUT time.Duration = 5
+	if source.Size > 1000000 {
+		TIMEOUT = 10 // Arbitrary num
+	}
+
+	log.Println("Looking at source:", source)
+	cidStr := source.Cid
+
+	// This blocks until we get info
+	// XXX: make this non-blocking, add a timeout or something...
+
+	// --- Resolved
+
+	go func(source Source, fetchAndProcessChan chan<- error) {
+		defer close(fetchAndProcessChan)
+		node, err := dserv.Get(ctx, cid.MustParse(cidStr))
+
+		log.Println("got node")
+
+		if err != nil {
+			log.Println(err)
+			panic("")
+		}
+
+		leaves := inst.LeafBlocks[source.Name]
+		size, _ := node.Size()
+		blockCount := int(blocksInSize(int64(size)))
+
+		log.Println("chunkcount", blockCount)
+
+		// XXX: maybe use a stack instead of recursion...
+		// also use GetMany instead of Get
+		leafCount := 0
+		var getleaves func(c cid.Cid)
+		getleaves = func(c cid.Cid) {
+			node, _ := dserv.Get(ctx, c)
+
+			links := node.Links()
+
+			if len(links) > 0 {
+				cids := make([]cid.Cid, len(links))
+				for i := range links {
+					cids[i] = links[i].Cid
+				}
+
+				if cids[0].Type() == cid.Raw {
+					for _, cc := range cids {
+						leaves[leafCount] = cc
+						leafCount++
+					}
+					return
+				} else {
+					for i := range cids {
+						getleaves(cids[i])
+					}
+					return
+				}
+			} else if c.Type() == cid.Raw {
+				// XXX: This might not be threadsafe, just in case you  want to multithread :)
+				leaves[leafCount] = c
+				leafCount++
+			} else {
+				// crappy assertion
+				log.Panicln("This should be impossible")
+			}
+		}
+
+		getleaves(node.Cid())
+		fetchAndProcessChan <- nil
+	}(source, fetchAndProcessChan)
+
+	select {
+	case err := <-fetchAndProcessChan:
+		if err != nil {
+			log.Println("Failed to get node or process leaves:", err)
+		} else {
+			log.Println("Successfully got node and processed leaves for source", source)
+		}
+	case <-time.After(TIMEOUT * time.Second):
+		log.Println("Timeout while fetching & processing source:", source)
+		// retryFetchChan <- true
+	}
+}
+
 func (inst *Instance) Start(ctx context.Context, httpPeers []string) {
 
 	// NOTE(Tom): these interfaces do the actual storage, it's currently configured to do everything in RAM
@@ -355,64 +445,11 @@ func (inst *Instance) Start(ctx context.Context, httpPeers []string) {
 			dserv := merkledag.NewReadOnlyDagService(merkledag.NewSession(ctx, merkledag.NewDAGService(inst.Bservice)))
 
 			for _, source := range inst.Sources {
-				log.Println("Looking at source:", source)
-				cidStr := source.Cid
-
-				// This blocks until we get info
-				// XXX: make this non-blocking, add a timeout or something...
-				node, err := dserv.Get(ctx, cid.MustParse(cidStr))
-
-				if err != nil {
-					log.Println(err)
-					panic("")
-				}
-
-				leaves := inst.LeafBlocks[source.Name]
-				size, _ := node.Size()
-				blockCount := int(blocksInSize(int64(size)))
-
-				log.Println("chunkcount", blockCount)
-
-				// XXX: maybe use a stack instead of recursion...
-				// also use GetMany instead of Get
-				leafCount := 0
-				var getleaves func(c cid.Cid)
-				getleaves = func(c cid.Cid) {
-					node, _ := dserv.Get(ctx, c)
-
-					links := node.Links()
-
-					if len(links) > 0 {
-						cids := make([]cid.Cid, len(links))
-						for i := range links {
-							cids[i] = links[i].Cid
-						}
-
-						if cids[0].Type() == cid.Raw {
-							for _, cc := range cids {
-								leaves[leafCount] = cc
-								leafCount++
-							}
-							return
-						} else {
-							for i := range cids {
-								getleaves(cids[i])
-							}
-							return
-						}
-					} else if c.Type() == cid.Raw {
-						// XXX: This might not be threadsafe, just in case you  want to multithread :)
-						leaves[leafCount] = c
-						leafCount++
-					} else {
-						// crappy assertion
-						log.Panicln("This should be impossible")
-					}
-				}
-
-				getleaves(node.Cid())
+				inst.getNodeAndProcess(ctx, dserv, source)
 			}
 		}
+
+		// Implement replication mechanism here. Can allot blocks based on frequency of access (Saved in the CID struct, see below, EOF)
 
 		randomizeBlocks := func() { // Which blocks should I seed (as a node (as a millionaire))
 			// Amazing distribution algorithm™️
@@ -610,4 +647,91 @@ func (inst *Instance) Start(ctx context.Context, httpPeers []string) {
 
 func (inst *Instance) Stop() {
 	// TODO: consider implementing this...
+}
+
+const (
+	replicationThreshold = 2
+	heartbeatInterval    = 5 * time.Second
+)
+
+type CidStruct struct {
+	CidString         string
+	CidMetaData       cid.Cid
+	ReplicationFactor int
+	CallFrequency     int
+}
+
+type ConnNodeMap struct {
+	NodeId  string
+	CidList []CidStruct
+}
+
+// Yet to finish this. But the strategy is to maintain a replication factory 'n' for each Cid such that in an event of nodes going offline or
+// if nodes volunteeringly stop seeding, the data is replicated to other nodes such that its not lost.
+
+// Design : https://excalidraw.com/#json=wehehgwv9tjnyYR4Ts8jD,2gnZ8ScVhNlQomFieUGfAQ
+
+func (inst *Instance) replicateData(ctx context.Context) {
+
+	// these will be part of the instance. But for testing they are separate
+	// connectedNodes := make([]ConnNodeMap, 0)
+	// currentPermanentConnections := make([]ConnNodeMap, 0)
+	// replicateDataChan := make(chan struct{})
+
+	// Listening for replicateData requests from any peer
+	// for {
+	// 	select {
+	// 	case req := <-replicateDataChan:
+	// 		cids := inst.sendReplicationRequest()
+	// 		connNodeMap := ConnNodeMap{
+	// 			NodeId:  req.NodeId,
+	// 			CidList: cids,
+	// 		}
+	// 		connectedNodes = append(connectedNodes, connNodeMap)
+
+	// 	case offlineNode := <-offlineNodeChan:
+	// 		// Handle nodes going offline
+	// 		for i, node := range connectedNodes {
+	// 			if node.NodeId == offlineNode.NodeId {
+	// 				connectedNodes = append(connectedNodes[:i], connectedNodes[i+1:]...)
+	// 				break
+	// 			}
+	// 		}
+
+	// 		// Inform other nodes about the reduced replication factor before dying
+	// 		inst.informNodesModifiedReplicationFactor(connectedNodes)
+
+	// 	case <-ctx.Done():
+	// 		return
+	// 	}
+
+	// 	// Periodically send Cid and their corresponding repli factor to other nodes
+	// 	select {
+	// 	case <-time.After(dataSendInterval):
+	// 		for _, node := range currentPermanentConnections {
+	// 			inst.sendHeartbeatWithData(node)
+	// 		}
+	// 	default:
+	// 	}
+
+	// 	// Respond to requests with CidList
+	// 	select {
+	// 	case req := <-cidListRequestChan:
+	// 		for _, node := range currentPermanentConnections {
+	// 			if node.NodeId == req.NodeId {
+	// 				resp := CidListResponse{
+	// 					NodeId:  inst.Host.ID().String(),
+	// 					CidList: node.CidList,
+	// 				}
+	// 				req.ResponseChan <- resp
+	// 				break
+	// 			}
+	// 		}
+	// 	default:
+	// 	}
+	// }
+}
+
+func (inst *Instance) sendReplicationRequest(CidStruct) {
+
 }
