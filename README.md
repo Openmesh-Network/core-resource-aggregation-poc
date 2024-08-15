@@ -2,6 +2,9 @@
 
 A proof-of-concept and testbed for future RAL project.
 
+## Demo video:
+[![YouTube](http://i.ytimg.com/vi/zCL06lTFDsA/hqdefault.jpg)](https://www.youtube.com/watch?v=zCL06lTFDsA)
+
 ## Project Layout
 
 - `main.go`: The main function. Entrance of the program.
